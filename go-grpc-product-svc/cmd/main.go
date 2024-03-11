@@ -5,12 +5,15 @@ import (
 	"log"
 	"net"
 
-	"github.com/Akshayvij07/go-grpc-project/gp-grpc-product-svc/pkg/db"
-	services "github.com/Akshayvij07/go-grpc-project/gp-grpc-product-svc/pkg/services"
+	"github.com/Akshayvij07/go-grpc-project/go-grpc-product-svc/pkg/config"
+	"github.com/Akshayvij07/go-grpc-project/go-grpc-product-svc/pkg/db"
+	"github.com/Akshayvij07/go-grpc-project/go-grpc-product-svc/pkg/pb"
+	services "github.com/Akshayvij07/go-grpc-project/go-grpc-product-svc/pkg/services"
+	"google.golang.org/grpc"
 )
 
 func main() {
-	c, err := conifg.LoadConfig()
+	c, err := config.LoadConfig()
 
 	if err != nil {
 		log.Fatalln("failed at config", err)

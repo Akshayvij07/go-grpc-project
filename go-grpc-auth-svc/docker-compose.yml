@@ -1,0 +1,36 @@
+version: '3'
+services:
+
+
+postgres:
+  image: postgres:alpine
+  environment:
+    - POSTGRES_USER = 
+    - POSTGRES_PASSWORD =
+    - POSTGRES_DB =
+    - POSTGRES_HOST =
+  ports :
+    - '5433:5432'
+  volumes :
+    - db:/var/lib/postgresql/data
+  networks : 
+   - myapp
+
+
+api :
+  build: .
+  image: 
+  env_file:
+    - .env
+  ports:
+    - 50051:50051
+  restart : on-failure
+  depands_on : 
+    -postgres
+  networks :
+    - myapp
+
+valumes :
+ db:
+networks:
+  myapp:

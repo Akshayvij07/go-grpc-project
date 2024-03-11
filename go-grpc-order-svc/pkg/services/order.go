@@ -13,6 +13,8 @@ import (
 type Server struct {
 	H          db.Handler
 	ProductSvc client.ProductServiceClient
+	pb.UnimplementedOrderServiceServer
+
 }
 
 func (s *Server) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {

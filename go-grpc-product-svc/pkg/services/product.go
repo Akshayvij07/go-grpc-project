@@ -11,6 +11,7 @@ import (
 
 type Server struct {
 	H db.Handler
+	pb.UnimplementedProductServiceServer
 }
 
 func (s *Server) CreateProduct(ctx context.Context, req *pb.CreateProductRequest) (*pb.CreateProductResponse, error) {
@@ -33,39 +34,38 @@ func (s *Server) CreateProduct(ctx context.Context, req *pb.CreateProductRequest
 	}, nil
 }
 
-
-func (s *Server) FindOne(ctx context.Context,req *pb.FindOneRequest) (*pb.FindOneData,error){
+func (s *Server) FindOne(ctx context.Context, req *pb.FindOneRequest) (*pb.FindOneResponse, error) {
 	var product models.Product
 
-	if result := s.H.DB.First(&product,req.Id); result.Error != nil{
+	if result := s.H.DB.First(&product, req.Id); result.Error != nil {
 		return &pb.FindOneResponse{
 			Status: http.StatusNotFound,
-			Error: result.Error.Error()
-		},nil
-
-		data := &pb.FindOneData{
-			Id : product.Id,
-			Name : product.Name,
-			Stock : product.Stock,
-			Price : product.Price,
-		}
-
-		return &pb.FindOneResponse{
-			Status: http.StatusOK,
-			Data: data,
-		},nil
+			Error:  result.Error.Error(),
+		}, nil
 	}
+
+	data := &pb.FindOneData{
+		Id:    product.Id,
+		Name:  product.Name,
+		Stock: product.Stock,
+		Price: product.Price,
+	}
+
+	return &pb.FindOneResponse{
+		Status: http.StatusOK,
+		Data:   data,
+	}, nil
+
 }
 
-
-func (s *Server) DecreaseStock(ctx context.Context,req *pb.DecreaseStockRequest)(*pb.DecreaseStockResponse,error){
+func (s *Server) DecreaseStock(ctx context.Context, req *pb.DecreaseStockRequest) (*pb.DecreaseStockResponse, error) {
 	var product models.Product
 
-	if result := s.H.DB.First(&product,req.Id); result.Error != nil {
+	if result := s.H.DB.First(&product, req.Id); result.Error != nil {
 		return &pb.DecreaseStockResponse{
 			Status: http.StatusConflict,
-			Error: result.Error.Error(),
-		},nil
+			Error:  result.Error.Error(),
+		}, nil
 	}
 
 	if product.Stock <= 0 {
@@ -77,11 +77,11 @@ func (s *Server) DecreaseStock(ctx context.Context,req *pb.DecreaseStockRequest)
 
 	var log models.StockDecreaseLog
 
-	if result := s.H.DB.Where(&models.StockDecreaseLog{OrderId: req.OrderId}).First(&log); result.Error == nil{
+	if result := s.H.DB.Where(&models.StockDecreaseLog{OrderId: req.OrderId}).First(&log); result.Error == nil {
 		return &pb.DecreaseStockResponse{
 			Status: http.StatusConflict,
-			Error: "Stock already Decreased"
-		},nil
+			Error:  "Stock already Decreased",
+		}, nil
 
 	}
 
@@ -97,6 +97,5 @@ func (s *Server) DecreaseStock(ctx context.Context,req *pb.DecreaseStockRequest)
 	return &pb.DecreaseStockResponse{
 		Status: http.StatusOK,
 	}, nil
-
 
 }
